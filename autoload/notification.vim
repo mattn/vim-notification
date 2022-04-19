@@ -1,0 +1,147 @@
+let s:notifications = get(s:, 'notifications', [])
+
+function! s:strwidthpart(str, width) abort
+  let l:str = tr(a:str, "\t", ' ')
+  let l:vcol = a:width + 2
+  return matchstr(l:str, '.*\%<' . (l:vcol < 0 ? 0 : l:vcol) . 'v')
+endfunction
+
+function! s:truncate(str, width) abort
+  if a:str =~# '^[\x00-\x7f]*$'
+    return len(a:str) < a:width
+          \ ? printf('%-' . a:width . 's', a:str)
+          \ : strpart(a:str, 0, a:width)
+  endif
+
+  let l:ret = a:str
+  let l:width = strwidth(a:str)
+  if l:width > a:width
+    let l:ret = s:strwidthpart(l:ret, a:width)
+    let l:width = strwidth(l:ret)
+  endif
+
+  if l:width < a:width
+    let l:ret .= repeat(' ', a:width - l:width)
+  endif
+
+  return l:ret
+endfunction
+
+function! s:callback(timer) abort
+  let l:drop = []
+  let l:active = 0
+  for l:n in s:notifications
+    let [l:winid, l:options, l:context] = [l:n[0], l:n[1], l:n[2]]
+
+    " calculate max width of the notification
+    let l:width = max(map(copy(l:context.lines), 'strdisplaywidth(v:val)'))
+
+    " skip notifications which is still not located yet
+    if !l:context.active
+      continue
+    endif
+    let l:active += 1
+
+    if l:context.count == 0 && &columns - l:options.col < l:width + 2
+      " move left
+      let l:options.col -= 1
+    elseif l:context.count < l:context.wait
+      " wait a while
+      let l:context.count += 1
+    elseif l:options.col < &columns - 1
+      " move right
+      let l:options.col += 1
+    else
+      " drop
+      call popup_close(l:winid)
+      call add(l:drop, l:winid)
+      continue
+    endif
+
+    let l:bufnr = winbufnr(l:winid)
+    let l:lines = map(copy(l:context.lines), {i, v -> s:truncate(v, min([&columns - l:options.col, l:width]))})
+    call setbufline(l:bufnr, 1, l:lines)
+    call popup_show(l:winid)
+    call popup_setoptions(l:winid, l:options)
+  endfor
+
+  " remove notifications wiped out
+  for l:v in l:drop
+    let s:notifications = filter(s:notifications, 'l:v != v:val[0]')
+  endfor
+
+  " standby next notifications
+  if l:active == 0
+    let l:line = 2
+    for l:n in s:notifications
+      let l:n[1].line = l:line
+      let l:line += 3 + len(l:n[2].lines)
+      if l:line  >= &lines
+        break
+      endif
+      let l:n[2].active = v:true
+    endfor
+  endif
+
+  " start timer if still have to do
+  if len(s:notifications) > 0
+    call timer_start(10, function('s:callback'))
+  endif
+endfunction
+
+function! notification#show(arg) abort
+  let l:option = type(a:arg) == type({}) ? a:arg : {'text': a:arg}
+  let l:winid = popup_create('', {'padding': [1,1,1,1], 'hidden': v:true, 'mapping': v:true})
+  let l:lines = split(get(l:option, 'text', ''), '\n')
+
+  " calculate position
+  let l:line = 2
+  if !empty(s:notifications) 
+    let l:line = s:notifications[-1][1].line + len(s:notifications[-1][2].lines) + 3
+  endif
+
+  let l:opt = {'line': l:line, 'col': &columns}
+  let l:ctx = {'lines': l:lines, 'count': 0, 'wait': get(l:option, 'wait', 100), 'active': (l:line + 3 + len(l:lines)) < &lines}
+  if has_key(l:option, 'click')
+    let l:ctx.click = l:option.click
+    call win_execute(l:winid, printf('nnoremap <silent> <LeftMouse> :call <SID>click(%d)<cr>', l:winid))
+  endif
+  let l:n = [l:winid, l:opt, l:ctx]
+  call add(s:notifications, l:n)
+
+  " start timer
+  if len(s:notifications) == 1
+    call timer_start(0, function('s:callback'))
+  endif
+endfunction
+
+function! s:click(n) abort
+  for l:n in s:notifications
+    if l:n[0] ==# a:n
+      let l:n[2].count = l:n[2].wait
+      if has_key(l:n[2], 'click')
+        try
+          call l:n[2].click()
+        catch
+        endtry
+      endif
+    endif
+  endfor
+endfunction
+
+function! s:my_click(data) abort
+  echomsg a:data
+endfunction
+
+call notification#show({"text": "ひとっつ", "click": function('s:my_click', ['https://www.google.com'])})
+"call notification#show("ひっとよ～り")
+"call notification#show("ちっから～もち～")
+"call notification#show("ふたっつ")
+"call notification#show("ふ～る\nさ～と")
+"call notification#show("あっとに～して～")
+"call notification#show("は～な～の～")
+"call notification#show("東京で～")
+"call notification#show("腕だめっし～")
+"call notification#show("三つ未来の大物\nだい")
+"call notification#show("大ちゃんあっちょれ")
+"call notification#show("人気物～")
