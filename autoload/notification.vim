@@ -92,7 +92,13 @@ endfunction
 
 function! notification#show(arg) abort
   let l:option = type(a:arg) == type({}) ? a:arg : {'text': a:arg}
-  let l:winid = popup_create('', {'padding': [1,1,1,1], 'hidden': v:true, 'mapping': v:true})
+  let l:winid = popup_create(
+  \  '', {
+  \    'padding': [1,1,1,1],
+  \    'hidden': v:true,
+  \    'mapping': v:true,
+  \    'title': get(l:option, 'title', '')
+  \  })
   let l:lines = split(get(l:option, 'text', ''), '\n')
 
   " calculate position
