@@ -55,6 +55,7 @@ function! s:callback(timer) abort
       " drop
       call popup_close(l:winid)
       call add(l:drop, l:winid)
+      call s:call_by_winid(l:winid, 'closed')
       continue
     endif
 
@@ -102,9 +103,12 @@ function! notification#show(arg) abort
 
   let l:opt = {'line': l:line, 'col': &columns}
   let l:ctx = {'lines': l:lines, 'count': 0, 'wait': get(l:option, 'wait', 100), 'active': (l:line + 3 + len(l:lines)) < &lines}
-  if has_key(l:option, 'click')
-    let l:ctx.click = l:option.click
-    call win_execute(l:winid, printf('nnoremap <silent> <LeftMouse> :call <SID>click(%d)<cr>', l:winid))
+  if has_key(l:option, 'clicked')
+    let l:ctx.clicked = l:option.clicked
+    call win_execute(l:winid, printf('nnoremap <silent> <LeftMouse> :call <SID>clicked(%d)<cr>', l:winid))
+  endif
+  if has_key(l:option, 'closed')
+    let l:ctx.closed = l:option.closed
   endif
   let l:n = [l:winid, l:opt, l:ctx]
   call add(s:notifications, l:n)
@@ -115,13 +119,14 @@ function! notification#show(arg) abort
   endif
 endfunction
 
-function! s:click(n) abort
+function! s:call_by_winid(winid, fun) abort
   for l:n in s:notifications
-    if l:n[0] ==# a:n
+    if l:n[0] ==# a:winid
       let l:n[2].count = l:n[2].wait
-      if has_key(l:n[2], 'click')
+      if has_key(l:n[2], a:fun)
+        let l:F = l:n[2][a:fun]
         try
-          call l:n[2].click()
+          call l:F()
         catch
         endtry
       endif
@@ -129,12 +134,20 @@ function! s:click(n) abort
   endfor
 endfunction
 
-function! s:my_click(data) abort
+function! s:closed(winid) abort
+  call s:call_by_winid(a:winid, 'closed')
+endfunction
+
+function! s:clicked(winid) abort
+  call s:call_by_winid(a:winid, 'clicked')
+endfunction
+
+function! s:my_clicked(data) abort
   echomsg a:data
 endfunction
 
-call notification#show({"text": "ひとっつ", "click": function('s:my_click', ['https://www.google.com'])})
-"call notification#show("ひっとよ～り")
+call notification#show({"text": "ひとっつ", "clicked": function('s:my_clicked', ['https://www.google.com'])})
+call notification#show({"text": "ひっとよ～り", "closed": function('s:my_clicked', ['https://www.google.com'])})
 "call notification#show("ちっから～もち～")
 "call notification#show("ふたっつ")
 "call notification#show("ふ～る\nさ～と")
