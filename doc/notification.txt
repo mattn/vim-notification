@@ -74,5 +74,9 @@ notification#show({expr})
 			\  clicked: function('s:my_clicked', ['Hi!']),
 			\)
 <
+                                                       *notification#terminate*
+notification#terminate()
+		Close all notification window.
+
 ==============================================================================
 vim: filetype=help expandtab textwidth=78 tabstop=8 norightleft foldenable foldlevel=0 :

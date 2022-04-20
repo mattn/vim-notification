@@ -27,6 +27,14 @@ function! s:truncate(str, width) abort
   return l:ret
 endfunction
 
+function! notification#terminate() abort
+  for l:n in s:notifications
+    let l:winid = l:n[0]
+    call popup_close(l:winid)
+    call s:call_by_winid(l:winid, 'closed')
+  endfor
+endfunction
+
 function! s:callback(timer) abort
   let l:drop = []
   let l:active = 0
