@@ -141,20 +141,3 @@ endfunction
 function! s:clicked(winid) abort
   call s:call_by_winid(a:winid, 'clicked')
 endfunction
-
-function! s:my_clicked(data) abort
-  echomsg a:data
-endfunction
-
-"call notification#show({"text": "ひとっつ", "clicked": function('s:my_clicked', ['https://www.google.com'])})
-"call notification#show({"text": "ひっとよ～り", "closed": function('s:my_clicked', ['https://www.google.com'])})
-"call notification#show("ちっから～もち～")
-"call notification#show("ふたっつ")
-"call notification#show("ふ～る\nさ～と")
-"call notification#show("あっとに～して～")
-"call notification#show("は～な～の～")
-"call notification#show("東京で～")
-"call notification#show("腕だめっし～")
-"call notification#show("三つ未来の大物\nだい")
-"call notification#show("大ちゃんあっちょれ")
-"call notification#show("人気物～")
