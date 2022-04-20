@@ -1,0 +1,77 @@
+*notification.txt*
+
+           -------------------------------------------------------
+                       The notification system for Vim
+           -------------------------------------------------------
+
+Author: Yasuhiro Matsumoto <mattn.jp@gmail.com>
+Repository: https://github.com/mattn/vim-notification
+License: MIT
+
+==============================================================================
+CONTENTS                                                *notification-contents*
+
+Introduction           |notification-introduction|
+Install                |notification-install|
+APIs                   |notification-api|
+
+==============================================================================
+INTRODUCTION                           *notification-introduction* *notification*
+
+Notification is an utility plugin for displaying message notification.  This
+plugin provides APIs to put notification popup window.
+
+==============================================================================
+INSTALL                                                  *notification-install*
+
+Install the distributed files into Vim runtime directory which is usually
+'~/.vim/', or '$HOME/vimfiles' on Windows.
+
+If you install vim-plug (https://github.com/junegunn/vim-plug), add this line
+to your .vimrc file:
+>
+  Plug 'mattn/vim-notification'
+<
+==============================================================================
+APIs                                                         *notification-api*
+
+                                                            *notification#show*
+notification#show({expr})
+		If {expr} is a string, popup window is simply shown. If {expr}
+                is dictionary, possible entities are below: 
+			text		text should be shown.
+			wait		time to stay on screen.
+			clicked		event handler for click.
+			closed		event handler for closed.
+
+		Standard usage of this function: 
+>
+			call nofitication#show('Hello World')
+<
+		Or below:
+>
+			call nofitication#show(#{
+			\  text: 'Hello World',
+			\)
+<
+		If you want to specify waiting time to stay the notification
+		on screen:
+>
+			call nofitication#show(#{
+			\  text: 'Hello World',
+			\  wait: 300,
+			\)
+<
+		To handle clicked/closed event:
+>
+			function! s:my_clicked(data) abort
+			  echo a:data
+			endfunction
+
+			call nofitication#show(#{
+			\  text: 'Hello World',
+			\  clicked: function('s:my_clicked', ['Hi!']),
+			\)
+<
+==============================================================================
+vim: filetype=help expandtab textwidth=78 tabstop=8 norightleft foldenable foldlevel=0 :
