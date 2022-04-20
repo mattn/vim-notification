@@ -7,7 +7,7 @@ Message notification system for Vim
 ## Usage
 
 ```vim
-:call notification#show('Hello World')
+call notification#show('Hello World')
 ```
 
 ```vim
