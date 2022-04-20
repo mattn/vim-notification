@@ -2,6 +2,8 @@
 
 Message notification system for Vim
 
+![](https://raw.githubusercontent.com/mattn/vim-notification/main/doc/screenshot.gif)
+
 ## Usage
 
 ```vim
