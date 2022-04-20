@@ -53,7 +53,7 @@ notification#show({expr})
 >
 			call nofitication#show(#{
 			\  text: 'Hello World',
-			\)
+			\})
 <
 		If you want to specify waiting time to stay the notification
 		on screen:
@@ -61,7 +61,7 @@ notification#show({expr})
 			call nofitication#show(#{
 			\  text: 'Hello World',
 			\  wait: 300,
-			\)
+			\})
 <
 		To handle clicked/closed event:
 >
@@ -72,7 +72,7 @@ notification#show({expr})
 			call nofitication#show(#{
 			\  text: 'Hello World',
 			\  clicked: function('s:my_clicked', ['Hi!']),
-			\)
+			\})
 <
                                                        *notification#terminate*
 notification#terminate()
