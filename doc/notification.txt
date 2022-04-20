@@ -18,7 +18,7 @@ APIs                   |notification-api|
 ==============================================================================
 INTRODUCTION                           *notification-introduction* *notification*
 
-Notification is an utility plugin for displaying message notification.  This
+Notification is a utility plugin for displaying message notification.  This
 plugin provides APIs to put notification popup window.
 
 ==============================================================================
@@ -38,7 +38,7 @@ APIs                                                         *notification-api*
                                                             *notification#show*
 notification#show({expr})
 		If {expr} is a string, popup window is simply shown. If {expr}
-                is dictionary, possible entities are below: 
+                is a dictionary, possible entities are below: 
 			text		text should be shown.
 			wait		time to stay on screen.
 			clicked		event handler for click.
