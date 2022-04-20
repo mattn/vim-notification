@@ -146,8 +146,8 @@ function! s:my_clicked(data) abort
   echomsg a:data
 endfunction
 
-call notification#show({"text": "ひとっつ", "clicked": function('s:my_clicked', ['https://www.google.com'])})
-call notification#show({"text": "ひっとよ～り", "closed": function('s:my_clicked', ['https://www.google.com'])})
+"call notification#show({"text": "ひとっつ", "clicked": function('s:my_clicked', ['https://www.google.com'])})
+"call notification#show({"text": "ひっとよ～り", "closed": function('s:my_clicked', ['https://www.google.com'])})
 "call notification#show("ちっから～もち～")
 "call notification#show("ふたっつ")
 "call notification#show("ふ～る\nさ～と")
