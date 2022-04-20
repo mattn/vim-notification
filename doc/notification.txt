@@ -40,6 +40,7 @@ notification#show({expr})
 		If {expr} is a string, popup window is simply shown. If {expr}
                 is dictionary, possible entities are below: 
 			text		text should be shown.
+			title		notification title.
 			wait		time to stay on screen.
 			clicked		event handler for click.
 			closed		event handler for closed.
