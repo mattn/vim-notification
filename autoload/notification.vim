@@ -43,7 +43,7 @@ function! s:callback(timer) abort
     let [l:winid, l:options, l:context] = [l:n[0], l:n[1], l:n[2]]
 
     " calculate max width of the notification
-    let l:width = max(map(copy(l:context.lines), 'strdisplaywidth(v:val)'))
+    let l:width = max(map(copy(l:context.lines), 'min([strdisplaywidth(v:val), &columns - 4])'))
 
     " skip notifications which is still not located yet
     if !l:context.active
@@ -109,6 +109,9 @@ function! notification#show(arg) abort
   \    'title': get(l:option, 'title', '')
   \  })
   let l:lines = split(get(l:option, 'text', ''), '\n')
+  if len(l:lines) > &lines - &cmdheight - 5
+    let l:lines = l:lines[:&lines - &cmdheight - 5]
+  endif
 
   " calculate position
   let l:line = 2
