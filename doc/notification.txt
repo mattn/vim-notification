@@ -41,7 +41,7 @@ notification#show({expr})
                 is a dictionary, possible entities are below: 
 			text		text should be shown.
 			title		notification title.
-			wait		time to stay on screen.
+			wait		milli-sec time to stay on screen.
 			clicked		event handler for click.
 			closed		event handler for closed.
 

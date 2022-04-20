@@ -1,4 +1,5 @@
 let s:notifications = get(s:, 'notifications', [])
+let s:interval = get(g:, 'notification_interval', 50)
 
 function! s:strwidthpart(str, width) abort
   let l:str = tr(a:str, "\t", ' ')
@@ -55,7 +56,7 @@ function! s:callback(timer) abort
       let l:options.col -= 1
     elseif l:context.count < l:context.wait
       " wait a while
-      let l:context.count += 1
+      let l:context.count += s:interval
     elseif l:options.col < &columns - 1
       " move right
       let l:options.col += 1
@@ -94,7 +95,7 @@ function! s:callback(timer) abort
 
   " start timer if still have to do
   if len(s:notifications) > 0
-    call timer_start(10, function('s:callback'))
+    call timer_start(s:interval, function('s:callback'))
   endif
 endfunction
 
@@ -116,7 +117,7 @@ function! notification#show(arg) abort
   endif
 
   let l:opt = {'line': l:line, 'col': &columns}
-  let l:ctx = {'lines': l:lines, 'count': 0, 'wait': get(l:option, 'wait', 100), 'active': (l:line + 3 + len(l:lines)) < &lines}
+  let l:ctx = {'lines': l:lines, 'count': 0, 'wait': get(l:option, 'wait', 5000), 'active': (l:line + 3 + len(l:lines)) < &lines}
   if has_key(l:option, 'clicked')
     let l:ctx.clicked = l:option.clicked
     call win_execute(l:winid, printf('nnoremap <silent> <LeftMouse> :call <SID>clicked(%d)<cr>', l:winid))
