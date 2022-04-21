@@ -11,7 +11,7 @@ call notification#show('Hello World')
 ```
 
 ```vim
-call nofitication#show(#{
+call notification#show(#{
 \  text: 'Hello World',
 \})
 ```
@@ -19,7 +19,7 @@ call nofitication#show(#{
 If you want to specify waiting time to stay the notification on screen:
 
 ```vim
-call nofitication#show(#{
+call notification#show(#{
 \  text: 'Hello World',
 \  wait: 300,
 \})
@@ -32,7 +32,7 @@ function! s:my_clicked(data) abort
   echo a:data
 endfunction
 
-call nofitication#show(#{
+call notification#show(#{
 \  text: 'Hello World',
 \  clicked: function('s:my_clicked', ['Hi!']),
 \})
