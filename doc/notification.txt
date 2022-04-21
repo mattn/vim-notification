@@ -47,18 +47,18 @@ notification#show({expr})
 
 		Standard usage of this function: 
 >
-			call nofitication#show('Hello World')
+			call notification#show('Hello World')
 <
 		Or below:
 >
-			call nofitication#show(#{
+			call notification#show(#{
 			\  text: 'Hello World',
 			\})
 <
 		If you want to specify waiting time to stay the notification
 		on screen:
 >
-			call nofitication#show(#{
+			call notification#show(#{
 			\  text: 'Hello World',
 			\  wait: 300,
 			\})
@@ -69,7 +69,7 @@ notification#show({expr})
 			  echo a:data
 			endfunction
 
-			call nofitication#show(#{
+			call notification#show(#{
 			\  text: 'Hello World',
 			\  clicked: function('s:my_clicked', ['Hi!']),
 			\})
