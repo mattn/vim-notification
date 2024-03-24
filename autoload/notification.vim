@@ -68,9 +68,8 @@ function! s:callback(timer) abort
       continue
     endif
 
-    let l:bufnr = winbufnr(l:winid)
     let l:lines = map(copy(l:context.lines), {i, v -> s:truncate(v, min([&columns - l:options.col, l:width]))})
-    call setbufline(l:bufnr, 1, l:lines)
+    call popup_settext(l:winid, l:lines)
     call popup_show(l:winid)
     call popup_setoptions(l:winid, l:options)
   endfor
