@@ -100,12 +100,19 @@ endfunction
 
 function! notification#show(arg) abort
   let l:option = type(a:arg) == type({}) ? a:arg : {'text': a:arg}
+  let l:title = get(l:option, 'title', '')
+  " Hack: There's no way to detect mouse clicks on certain popup window other
+  " than to enable 'close popup on mouse click' behavior.  Make popup window
+  " be closed on mouse click and handle it in popup callback when we have user
+  " callback and need to handle mouse clicks on popup windows.
   let l:winid = popup_create(
   \  '', {
   \    'padding': [1,1,1,1],
   \    'hidden': v:true,
   \    'mapping': v:true,
-  \    'title': get(l:option, 'title', '')
+  \    'title': l:title,
+  \    'close': has_key(l:option, 'clicked') ? 'click' : 'none',
+  \    'callback': function('s:on_popup_close'),
   \  })
   let l:lines = split(get(l:option, 'text', ''), '\n')
   if len(l:lines) > &lines - &cmdheight - 5
@@ -114,15 +121,14 @@ function! notification#show(arg) abort
 
   " calculate position
   let l:line = 2
-  if !empty(s:notifications) 
+  if !empty(s:notifications)
     let l:line = s:notifications[-1][1].line + len(s:notifications[-1][2].lines) + 3
   endif
 
   let l:opt = {'line': l:line, 'col': &columns}
-  let l:ctx = {'lines': l:lines, 'count': 0, 'wait': get(l:option, 'wait', 5000), 'active': (l:line + 3 + len(l:lines)) < &lines}
+  let l:ctx = {'lines': l:lines, 'title': l:title, 'count': 0, 'wait': get(l:option, 'wait', 5000), 'active': (l:line + 3 + len(l:lines)) < &lines}
   if has_key(l:option, 'clicked')
     let l:ctx.clicked = l:option.clicked
-    call win_execute(l:winid, printf('nnoremap <silent> <LeftMouse> :call <SID>clicked(%d)<cr>', l:winid))
   endif
   if has_key(l:option, 'closed')
     let l:ctx.closed = l:option.closed
@@ -134,6 +140,28 @@ function! notification#show(arg) abort
   if len(s:notifications) == 1
     call timer_start(0, function('s:callback'))
   endif
+endfunction
+
+function! s:on_popup_close(winid, result) abort
+  if a:result != -2
+    return
+  endif
+
+  " Popup is closed by mouse click.  Reopen popup and invoke 'clicked' user
+  " handler.  The reopened popup will closed with animation soon.
+  for l:n in s:notifications
+    if l:n[0] ==# a:winid
+      let l:new_winid = popup_create(l:n[2].lines, {
+      \    'padding': [1,1,1,1],
+      \    'title': l:n[2].title,
+      \    'line': l:n[1].line,
+      \    'col': l:n[1].col,
+      \  })
+      let l:n[0] = l:new_winid
+      call s:call_by_winid(l:new_winid, 'clicked')
+      return
+    endif
+  endfor
 endfunction
 
 function! s:call_by_winid(winid, fun) abort
@@ -153,8 +181,4 @@ endfunction
 
 function! s:closed(winid) abort
   call s:call_by_winid(a:winid, 'closed')
-endfunction
-
-function! s:clicked(winid) abort
-  call s:call_by_winid(a:winid, 'clicked')
 endfunction
