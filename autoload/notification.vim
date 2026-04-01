@@ -109,6 +109,7 @@ function! notification#show(arg) abort
   \  '', {
   \    'padding': [1,1,1,1],
   \    'hidden': v:true,
+  \    'opacity': get(l:option, 'opacity', 30),
   \    'mapping': v:true,
   \    'title': l:title,
   \    'close': has_key(l:option, 'clicked') ? 'click' : 'none',
@@ -126,7 +127,7 @@ function! notification#show(arg) abort
   endif
 
   let l:opt = {'line': l:line, 'col': &columns}
-  let l:ctx = {'lines': l:lines, 'title': l:title, 'count': 0, 'wait': get(l:option, 'wait', 5000), 'active': (l:line + 3 + len(l:lines)) < &lines}
+  let l:ctx = {'lines': l:lines, 'title': l:title, 'count': 0, 'wait': get(l:option, 'wait', 5000), 'opacity': get(l:option, 'opacity', 30), 'active': (l:line + 3 + len(l:lines)) < &lines}
   if has_key(l:option, 'clicked')
     let l:ctx.clicked = l:option.clicked
   endif
@@ -152,6 +153,7 @@ function! s:on_popup_close(winid, result) abort
   for l:n in s:notifications
     if l:n[0] ==# a:winid
       let l:new_winid = popup_create(l:n[2].lines, {
+      \    'opacity': get(l:n[2], 'opacity', 30),
       \    'padding': [1,1,1,1],
       \    'title': l:n[2].title,
       \    'line': l:n[1].line,
